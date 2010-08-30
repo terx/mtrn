@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+root=~/.mtrn
+tests=$root/tests
+results=$root/results
+current=$results/current
+resultdir=$results/$(date +%s)
+
+mkdir -p $resultdir
+test -e $current && rm $current
+ln -s $resultdir $current
+cd $root
+cp Makefile $current
+cd $current
+make tests
+cd $root
+rm $current

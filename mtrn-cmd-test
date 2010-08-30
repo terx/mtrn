@@ -1,0 +1,31 @@
+#!/bin/sh
+
+CMD=$1
+
+case $1 in
+    host_up)
+	HOST=$2
+	TEMP=$(mktemp)
+	if ping -n -c 1 -W 3 $HOST 2>&1 > $TEMP; then
+	    rm $TEMP
+	    touch host_up_${HOST}
+	    exit 0
+	else
+	    mv $TEMP host_down_${HOST}
+	    exit 1
+	fi
+    ;;
+    tcp_open)
+	HOST=$2
+	PORT=$3
+	TEMP=$(mktemp)
+	if nc -vvz $HOST $PORT 2>&1 > $TEMP; then
+	    rm $TEMP
+	    touch tcp_open_${HOST}_${PORT}
+	    exit 0
+	else
+	    mv $TEMP tcp_clode_${HOST}_${PORT}
+	    exit 1
+	fi
+esac
+

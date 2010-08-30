@@ -1,0 +1,30 @@
+#!/bin/sh
+
+CMD=$1
+
+case $1 in
+    ping_val)
+	HOST=$2
+	TEMP=$(mktemp)
+	if ping -n -c 5 -W 1 $HOST 2>&1 > $TEMP; then
+	    sed -nr 's|.*= ([0-9]+\.[0-9]+)/([0-9]+\.[0-9]+).*|\2|p' < $TEMP > log_ping_val_${HOST}
+	    rm $TEMP
+	    exit 0
+	else
+	    mv $TEMP err_ping_val_${HOST}
+	    exit 1
+	fi
+    ;;
+
+    sensors)
+	SENSOR=$1
+	FILE=/root/$SENSOR
+	if [ -e $FILE ]; then
+	    tail -n 1 $FILE > log_sensor_${SENSOR}
+	    exit 0
+	else
+	    echo "file not found: $FILE" > err_sensor_${SENSOR}
+	    exit 1
+	fi
+esac
+

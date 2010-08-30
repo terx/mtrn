@@ -1,0 +1,47 @@
+#!/bin/sh
+
+CMD=$1
+
+case $1 in
+    ping_val)
+	HOST=$2
+	COND=$3
+
+	LFILE=log_ping_val_${HOST}
+	RFILE=err_ping_val_${HOST}
+
+	if [ ! -e $LFILE ]; then
+		mtrn-cmd-log $1 $2
+	fi
+
+	test -e $RFILE && exit 1
+
+	VAL=$(cat $LFILE)
+
+	if [ $VAL $COND ]; then
+	    echo "WARNING: ping value of $HOST is $COND: $VAL"
+	fi
+    ;;
+
+    sensors)
+	SENSOR=$2
+	COND=$3
+
+	LFILE=log_sensor_${HOST}
+	RFILE=err_sensor_${HOST}
+
+	if [ ! -e $LFILE ]; then
+		mtrn-cmd-log $1 $2
+	fi
+
+	test -e $RFILE && exit 1
+
+	VAL=$(cat $LFILE)
+
+	if [ $VAL $COND ]; then
+	    echo "WARNING: sensor value of $SENSOR is $COND: $VAL"
+	fi
+
+    ;;
+esac
+

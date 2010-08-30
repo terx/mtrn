@@ -1,0 +1,37 @@
+#!/bin/sh
+
+CMD=$1
+
+case $1 in
+    ssh_key)
+	HOST=$2
+	PORT=$3
+
+	TEMP=$(mktemp)
+	FILE=../../proofs/ssh_key_${HOST}_${PORT}
+	DIFF=ssh_key_${HOST}_${PORT}
+
+	if ssh-keyscan -t rsa1,rsa,dsa -p 9824 localhost > $TEMP; then
+	    if [ -e $FILE ]; then
+		diff $FILE $TEMP > $DIFF
+	    else
+		cat $TEMP > $FILE
+		echo -n > $DIFF
+	    fi
+	    if [ -w $FILE ]; then
+		cat $TEMP > $FILE
+	    fi
+	    rm $TEMP
+	    if [ -s $DIFF ]; then
+		echo "WARNING: ssh host key differs!"
+		exit 1
+	    else
+		exit 0
+	    fi
+	else
+	    echo "WARNING: cannot get ssh host keys"
+	    exit 2
+	fi
+    ;;
+esac
+

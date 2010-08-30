@@ -1,0 +1,31 @@
+#!/usr/bin/perl -wT
+
+use strict;
+use warnings;
+
+my $dir = "~/.mtn";
+my $remotes = "$dir/remotes";
+my $rsync = qx(which rsync);
+
+open (REMOTES, $remotes);
+while (<REMOTES>) {
+    s/[;#].*$//;
+    s/\t+/ /g;
+    s/ +/ /g;
+    s/^ +//;
+    s/ +$//;
+    /^(push|pull) (.+) (from|to) ([^\@:]+(|\@[^\@:](|:\d+)))/i && lc $1.$3 =~ /^(pushto|pullfrom)$/ && {
+	my ($cmd, $source, $target, $port) = ($1, $2, $4, getprotobyname ('ssh'));
+	$target =~ /:(\d+)$/ && $port = $1;
+	$target =~ s/:.*$//g;
+	$cmd eq "push" && {
+	    my @cmd = ($rsync, '-vrRte', "$ssh -p $port", $source, $target);
+	    printf "(%s)\n", join ' ', @cmd;
+	};
+	$cmd eq "pull" && {
+	};
+	
+    };
+}
+close REMOTES;
+
