@@ -1,0 +1,8 @@
+#!/bin/sh
+
+ROOT=~/.mtrn
+
+for dir in tests proofs results; do
+    mkdir -p $ROOT/$dir
+done
+
